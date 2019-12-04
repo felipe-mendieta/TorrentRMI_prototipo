@@ -22,7 +22,10 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
 
     @Override
     public void run() {
+        
         iniciarServidor();
+                   
+
     }
 
     public void iniciarServidor() {
@@ -75,7 +78,7 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
     public static Servidor crearServidor(int PUERTO) {
         try {
             Servidor server = new Servidor(PUERTO);
-            server.setNombreDelArchivo("repositorioArchivos/julia-1.2.0-win32.exe");
+            server.setNombreDelArchivo("repositorioArchivos/parte.pdf");
             //Thread thread = new Thread(server);
             //thread.start();
             return server;
@@ -85,5 +88,7 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
         }
         return null;
     }
+
+    
 
 }

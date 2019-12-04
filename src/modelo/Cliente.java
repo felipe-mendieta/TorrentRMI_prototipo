@@ -23,6 +23,7 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
     private int PUERTO = 3232;
     static String nombreArchivo;
     private int tamArchivo;
+    private int parteArchivo;
     private static final Set<String> ipsNoDisp = new HashSet<>();
     public OperacionesServidor objetoRemoto;
 
@@ -34,6 +35,7 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
 
     @Override
     public void run() {
+        
         objetoRemoto = (OperacionesServidor) ejecutarMetodoRemoto("objetoServidor");
 
         try {
@@ -77,8 +79,10 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
             }
             System.out.println("Archivo trasmitido correctamente.");
         } catch (IOException e) {
-            System.out.println("Ip:" + this.serverAddress + " desconectada.");
-            System.out.println("Ips no disponibles: \n" + Cliente.ipsNoDisp.toString());
+            //System.out.println("Ip:" + this.serverAddress + " desconectada.");
+            //System.out.println("Ips no disponibles: \n" + Cliente.ipsNoDisp.toString());
+            //Cliente.ipsNoDisp.add(serverAddress);
+            
             e.printStackTrace();
         }
         return true;
