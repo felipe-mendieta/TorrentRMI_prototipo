@@ -21,9 +21,9 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
     private Registry registry;
     private String serverAddress;
     private int PUERTO = 3232;
-    static String nombreArchivo;
-    private int tamArchivo;
-    private int parteArchivo;
+    private File archivoLlegada;
+    private String nombreArchivoOriginal;
+    private long tamArchivoOriginal;
     private static final Set<String> ipsNoDisp = new HashSet<>();
     public OperacionesServidor objetoRemoto;
 
@@ -35,7 +35,7 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
 
     @Override
     public void run() {
-        
+
         objetoRemoto = (OperacionesServidor) ejecutarMetodoRemoto("objetoServidor");
 
         try {
@@ -43,6 +43,9 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
             objetoRemoto.login(this);//AquiOperacionesServidor pedimos el archivo al servidor
         } catch (RemoteException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+             System.out.println("Ip:" + this.serverAddress + " desconectada.");
+            System.out.println("Ips no disponibles: \n" + Cliente.ipsNoDisp.toString());
+            Cliente.ipsNoDisp.add(serverAddress);
         }
 
     }
@@ -71,18 +74,16 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
     @Override
     public boolean sendData(String filename, byte[] data, int len) throws RemoteException {
         try {
-            File f = new File("archivosRecibidos/" + filename);
-            f.createNewFile();
-            try (FileOutputStream out = new FileOutputStream(f, true)) {
+            archivoLlegada = new File("archivosRecibidos/" + filename);
+            archivoLlegada.createNewFile();
+            try (FileOutputStream out = new FileOutputStream(archivoLlegada, true)) {
                 out.write(data, 0, len);
                 out.flush();
             }
             System.out.println("Archivo trasmitido correctamente.");
         } catch (IOException e) {
-            //System.out.println("Ip:" + this.serverAddress + " desconectada.");
-            //System.out.println("Ips no disponibles: \n" + Cliente.ipsNoDisp.toString());
-            //Cliente.ipsNoDisp.add(serverAddress);
-            
+           Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, e);
+
             e.printStackTrace();
         }
         return true;
@@ -99,9 +100,10 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
             while (br.hasNextLine()) {
 
                 if (i == 0) {
-                    nombreArchivo = br.nextLine();
+                    
+                    nombreArchivoOriginal = br.nextLine();
                 } else if (i == 1) {
-                    this.tamArchivo = Integer.parseInt(br.nextLine());
+                    this.tamArchivoOriginal = Long.parseLong(br.nextLine());
 
                 } else if (i > 1) {
                     servidores.add(br.nextLine());
@@ -140,4 +142,12 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
         return null;
     }
 
+    public File getArchivoLlegada() {
+        return archivoLlegada;
+    }
+
+    public String getNombreArchivoOriginal() {
+        return nombreArchivoOriginal;
+    }
+    
 }

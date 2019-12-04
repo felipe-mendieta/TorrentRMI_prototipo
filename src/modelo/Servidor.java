@@ -22,9 +22,8 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
 
     @Override
     public void run() {
-        
+
         iniciarServidor();
-                   
 
     }
 
@@ -67,6 +66,13 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
     }
 
     @Override
+    public long getSizeFile(String nombre) {
+        File archivo = new File("repositorioArchivos/" + nombre);
+        return archivo.length();
+
+    }
+
+    @Override
     public int calcularMayor(int num1, int num2) throws RemoteException {
         return Math.max(num2, num1);
     }
@@ -88,7 +94,5 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
         }
         return null;
     }
-
-    
 
 }

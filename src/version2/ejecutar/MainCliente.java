@@ -7,7 +7,6 @@ package version2.ejecutar;
 
 import java.rmi.RemoteException;
 import modelo.Cliente;
-import modelo.OperacionesServidor;
 
 public class MainCliente {
 
