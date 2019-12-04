@@ -6,18 +6,19 @@
 package version2.ejecutar;
 
 import java.rmi.RemoteException;
-import version2.cliente.OperacionCliente;
-import version2.servidor.OperacionInterfaz;
+import modelo.Cliente;
+import modelo.OperacionesServidor;
 
 
 
 public class MainCliente {
     public static void main(String[] args) throws RemoteException {
-        OperacionCliente cliente1=new OperacionCliente();
+        Cliente cliente1=new Cliente();
         cliente1.conectarAlServidor();
-        OperacionInterfaz objetoRemoto;
+        OperacionesServidor objetoRemoto;
         objetoRemoto=cliente1.ejecutarMetodoRemoto("objetoServidor");
-        System.out.println(objetoRemoto.calcularMayor(5, 6));
+        
+        objetoRemoto.login(cliente1);//Aqui pedimos el archivo al servidor
         
     }
     
