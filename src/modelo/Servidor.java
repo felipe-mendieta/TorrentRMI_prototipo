@@ -17,7 +17,7 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
 
     private static final long serialVersionUID = 1;
     private int PUERTO = 3232;
-    private String nombreDelArchivo = "repositorioArchivos/parte.pdf";
+    private String nombreDelArchivo ;
     Registry registry;
 
     @Override
@@ -46,7 +46,7 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
     }
 
     @Override
-    public boolean login(OperacionesCliente c) throws RemoteException {//Envia el archivo
+    public boolean login(OperacionesCliente c,String nombreDelArchivo) throws RemoteException {//Envia el archivo
 
         try {
             File f1 = new File(nombreDelArchivo);
@@ -84,7 +84,6 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
     public static Servidor crearServidor(int PUERTO) {
         try {
             Servidor server = new Servidor(PUERTO);
-            server.setNombreDelArchivo("repositorioArchivos/parte.pdf");
             //Thread thread = new Thread(server);
             //thread.start();
             return server;

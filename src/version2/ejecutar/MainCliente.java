@@ -11,9 +11,13 @@ import modelo.Cliente;
 public class MainCliente {
 
     public static void main(String[] args) throws RemoteException {
+        
         Cliente cliente1 = Cliente.crearCliente("localhost", 3232);
-        Cliente cliente21 = Cliente.crearCliente("localhost", 3232);
-       
+        Cliente.pedirParteAlServer("repositorioArchivos/parte1.pdf",cliente1);//aqui iria cliente.llenarArchivoplano
+
+        Cliente cliente2 = Cliente.crearCliente("localhost", 3232);
+        Cliente.pedirParteAlServer("repositorioArchivos/parte2.qgz",cliente2);//aqui iria cliente.llenarArchivoplano
+
     }
 
 }

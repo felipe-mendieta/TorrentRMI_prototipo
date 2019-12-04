@@ -22,7 +22,7 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
     private String serverAddress;
     private int PUERTO = 3232;
     private File archivoLlegada;
-    private String nombreArchivoOriginal;
+    private String nombreArchivoAPedir;
     private long tamArchivoOriginal;
     private static final Set<String> ipsNoDisp = new HashSet<>();
     public OperacionesServidor objetoRemoto;
@@ -32,7 +32,9 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
         this.serverAddress = serverAddress;
         this.PUERTO = PUERTO;
     }
-
+    public static synchronized boolean addSet(String ipNoDisp){
+        return ipsNoDisp.add(ipNoDisp);
+    } 
     @Override
     public void run() {
 
@@ -40,12 +42,18 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
 
         try {
 
-            objetoRemoto.login(this);//AquiOperacionesServidor pedimos el archivo al servidor
+            objetoRemoto.login(this, nombreArchivoAPedir);//AquiOperacionesServidor pedimos el archivo al servidor
+        
         } catch (RemoteException ex) {
+
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-             System.out.println("Ip:" + this.serverAddress + " desconectada.");
+            System.out.println("Ip:" + this.serverAddress + " desconectada.");
             System.out.println("Ips no disponibles: \n" + Cliente.ipsNoDisp.toString());
-            Cliente.ipsNoDisp.add(serverAddress);
+            Cliente.addSet(serverAddress);
+            
+            Cliente cliente = Cliente.crearCliente("localhost", 3232);
+            Cliente.pedirParteAlServer(nombreArchivoAPedir,cliente);//aqui iria cliente.llenarArchivoplano
+
         }
 
     }
@@ -56,7 +64,7 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
             registry = LocateRegistry.getRegistry(serverAddress, PUERTO);
 
         } catch (RemoteException e) {
-            ipsNoDisp.add(serverAddress);
+            Cliente.addSet(serverAddress);
             System.out.println("Ips no disponibles: \n" + Cliente.ipsNoDisp.toString());
         }
     }
@@ -82,7 +90,7 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
             }
             System.out.println("Archivo trasmitido correctamente.");
         } catch (IOException e) {
-           Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, e);
 
             e.printStackTrace();
         }
@@ -100,8 +108,8 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
             while (br.hasNextLine()) {
 
                 if (i == 0) {
-                    
-                    nombreArchivoOriginal = br.nextLine();
+
+                    nombreArchivoAPedir = br.nextLine();
                 } else if (i == 1) {
                     this.tamArchivoOriginal = Long.parseLong(br.nextLine());
 
@@ -129,12 +137,11 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
         try {
             cliente = new Cliente(serverAddress, PUERTO);
             cliente.conectarAlServidor();
-            Thread hilo = new Thread(cliente);
-            hilo.start();
+
             return cliente;
         } catch (RemoteException ex) {
             System.err.println("Ip no disponible, no se conecto con: " + PUERTO);
-            ipsNoDisp.add(serverAddress);
+            Cliente.addSet(serverAddress);
             System.out.println("Ips no disponibles: \n" + Cliente.ipsNoDisp.toString());
 
         }
@@ -142,12 +149,22 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
         return null;
     }
 
+    public static void pedirParteAlServer(String nomParte, Cliente cliente) {
+        cliente.setNombreArchivoAPedir(nomParte);//aqui iria cliente.llenarArchivoplano
+        Thread hilo = new Thread(cliente);
+        hilo.start();
+    }
+
     public File getArchivoLlegada() {
         return archivoLlegada;
     }
 
-    public String getNombreArchivoOriginal() {
-        return nombreArchivoOriginal;
+    public void setNombreArchivoAPedir(String nombreArchivoAPedir) {
+        this.nombreArchivoAPedir = nombreArchivoAPedir;
     }
-    
+
+    public String getNombreArchivoAPedir() {
+        return nombreArchivoAPedir;
+    }
+
 }
