@@ -17,18 +17,23 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
 
     private static final long serialVersionUID = 1;
     private int PUERTO = 3232;
-    private String nombreDelArchivo="repositorioArchivos/parte.pdf";
+    private String nombreDelArchivo = "repositorioArchivos/parte.pdf";
+    Registry registry;
 
     @Override
     public void run() {
+        iniciarServidor();
+    }
+
+    public void iniciarServidor() {
         try {
             String dirIP = (InetAddress.getLocalHost()).toString();
-            Registry registry = LocateRegistry.createRegistry(PUERTO);//Cuando acceda el cliente va a acceder a los metodos de esa registro en ese puerto
+            registry = LocateRegistry.createRegistry(PUERTO);//Cuando acceda el cliente va a acceder a los metodos de esa registro en ese puerto
             registry.bind("objetoServidor", (OperacionesServidor) this);
             System.out.println("Escuchando en: " + dirIP + ":" + PUERTO);
         } catch (UnknownHostException | AlreadyBoundException | RemoteException e) {
-            System.out.println("No se realizo la conexion.");
-
+            System.err.println("Fallo al iniciar el servidor.");
+            Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
@@ -51,7 +56,7 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
                 mylen = in.read(mydata);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, e);
 
         }
 
@@ -69,11 +74,13 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
 
     public static Servidor crearServidor(int PUERTO) {
         try {
-            Runnable server = new Servidor(PUERTO);
-            Thread thread = new Thread(server);
-            thread.start();
-            return (Servidor) server;
+            Servidor server = new Servidor(PUERTO);
+            server.setNombreDelArchivo("repositorioArchivos/julia-1.2.0-win32.exe");
+            //Thread thread = new Thread(server);
+            //thread.start();
+            return server;
         } catch (RemoteException ex) {
+
             Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;

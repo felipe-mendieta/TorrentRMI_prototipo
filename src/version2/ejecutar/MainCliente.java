@@ -9,16 +9,12 @@ import java.rmi.RemoteException;
 import modelo.Cliente;
 import modelo.OperacionesServidor;
 
-
-
 public class MainCliente {
+
     public static void main(String[] args) throws RemoteException {
-        Cliente cliente1=Cliente.crearCliente("localhost", 3232);
-        OperacionesServidor objetoRemoto;
-        objetoRemoto=cliente1.ejecutarMetodoRemoto("objetoServidor");
-        
-        objetoRemoto.login(cliente1);//Aqui pedimos el archivo al servidor
-        
+        Cliente cliente1 = Cliente.crearCliente("localhost", 3232);
+        Cliente cliente21 = Cliente.crearCliente("localhost", 3232);
+       
     }
-    
+
 }
