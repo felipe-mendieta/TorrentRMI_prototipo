@@ -13,19 +13,14 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Servidor extends UnicastRemoteObject implements OperacionesServidor {
+public class Servidor extends UnicastRemoteObject implements OperacionesServidor, Runnable {
 
     private static final long serialVersionUID = 1;
     private int PUERTO = 3232;
-    private String nombreDelArchivo;
+    private String nombreDelArchivo="repositorioArchivos/parte.pdf";
 
-    public Servidor(int PUERTO) throws RemoteException {
-        super();
-        this.PUERTO = PUERTO;
-
-    }
-
-    public boolean iniciarServidor() {
+    @Override
+    public void run() {
         try {
             String dirIP = (InetAddress.getLocalHost()).toString();
             Registry registry = LocateRegistry.createRegistry(PUERTO);//Cuando acceda el cliente va a acceder a los metodos de esa registro en ese puerto
@@ -33,9 +28,14 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
             System.out.println("Escuchando en: " + dirIP + ":" + PUERTO);
         } catch (UnknownHostException | AlreadyBoundException | RemoteException e) {
             System.out.println("No se realizo la conexion.");
-            return false;
+
         }
-        return true;
+    }
+
+    public Servidor(int PUERTO) throws RemoteException {
+        super();
+        this.PUERTO = PUERTO;
+
     }
 
     @Override
@@ -67,13 +67,16 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
         this.nombreDelArchivo = nombreDelArchivo;
     }
 
-    public Servidor crearServidor(int PUERTO) {
+    public static Servidor crearServidor(int PUERTO) {
         try {
-            Servidor sevidor = new Servidor(PUERTO);
-            return sevidor;
+            Runnable server = new Servidor(PUERTO);
+            Thread thread = new Thread(server);
+            thread.start();
+            return (Servidor) server;
         } catch (RemoteException ex) {
             Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
+
 }

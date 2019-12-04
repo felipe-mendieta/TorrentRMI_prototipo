@@ -5,5 +5,7 @@
  */
 package controlador;
 public class controladorVentanaPrincipal {
-    
+    public static void main(String[] args) {
+        
+    }
 }
