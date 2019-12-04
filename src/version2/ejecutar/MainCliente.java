@@ -13,7 +13,7 @@ import modelo.OperacionesServidor;
 
 public class MainCliente {
     public static void main(String[] args) throws RemoteException {
-        Cliente cliente1=new Cliente();
+        Cliente cliente1=new Cliente("localhost",3232);
         cliente1.conectarAlServidor();
         OperacionesServidor objetoRemoto;
         objetoRemoto=cliente1.ejecutarMetodoRemoto("objetoServidor");

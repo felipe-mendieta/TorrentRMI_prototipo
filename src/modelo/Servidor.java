@@ -10,16 +10,19 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Servidor extends UnicastRemoteObject implements OperacionesServidor {
 
     private static final long serialVersionUID = 1;
-    private final int PUERTO = 3232;
+    private int PUERTO = 3232;
     private String nombreDelArchivo;
 
-    public Servidor() throws RemoteException {
+    public Servidor(int PUERTO) throws RemoteException {
         super();
+        this.PUERTO = PUERTO;
+
     }
 
     public boolean iniciarServidor() {
@@ -63,5 +66,14 @@ public class Servidor extends UnicastRemoteObject implements OperacionesServidor
     public void setNombreDelArchivo(String nombreDelArchivo) {
         this.nombreDelArchivo = nombreDelArchivo;
     }
-    
+
+    public Servidor crearServidor(int PUERTO) {
+        try {
+            Servidor sevidor = new Servidor(PUERTO);
+            return sevidor;
+        } catch (RemoteException ex) {
+            Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
 }
