@@ -32,27 +32,29 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
         this.serverAddress = serverAddress;
         this.PUERTO = PUERTO;
     }
-    public static synchronized boolean addSet(String ipNoDisp){
+
+    public static synchronized boolean addSet(String ipNoDisp) {
         return ipsNoDisp.add(ipNoDisp);
-    } 
+    }
+
     @Override
     public void run() {
 
-        objetoRemoto = (OperacionesServidor) ejecutarMetodoRemoto("objetoServidor");
-
         try {
+            objetoRemoto = (OperacionesServidor) ejecutarMetodoRemoto("objetoServidor");
+            System.out.println("nombre del archivo pedido:" + nombreArchivoAPedir + " a " + serverAddress);
 
             objetoRemoto.login(this, nombreArchivoAPedir);//AquiOperacionesServidor pedimos el archivo al servidor
-        
-        } catch (RemoteException ex) {
+
+        } catch (Exception ex) {
 
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Ip:" + this.serverAddress + " desconectada.");
             System.out.println("Ips no disponibles: \n" + Cliente.ipsNoDisp.toString());
             Cliente.addSet(serverAddress);
-            
-            Cliente cliente = Cliente.crearCliente("localhost", 3232);
-            Cliente.pedirParteAlServer(nombreArchivoAPedir,cliente);//aqui iria cliente.llenarArchivoplano
+            System.out.println("Redistribuyendo a 87");
+            Cliente cliente = Cliente.crearCliente("172.16.147.87", 3232);//pidiendo a linux
+            Cliente.pedirParteAlServer(nombreArchivoAPedir, cliente);//aqui iria cliente.llenarArchivoplano
 
         }
 
@@ -60,17 +62,15 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
 
     public void conectarAlServidor() {
         try {
-            System.out.println(serverAddress + PUERTO);
             registry = LocateRegistry.getRegistry(serverAddress, PUERTO);
 
         } catch (RemoteException e) {
             Cliente.addSet(serverAddress);
-            System.out.println("Ips no disponibles: \n" + Cliente.ipsNoDisp.toString());
+            System.out.println("No se conecto al servidor.Ips no disponibles: \n" + Cliente.ipsNoDisp.toString());
         }
     }
 
-    public OperacionesServidor ejecutarMetodoRemoto(String identificadorObjeto) {
-        System.out.println(identificadorObjeto);
+    public OperacionesServidor ejecutarMetodoRemoto(String identificadorObjeto) {//candidato 
         try {
             return (OperacionesServidor) (registry.lookup(identificadorObjeto));
         } catch (RemoteException | NotBoundException ex) {
@@ -89,10 +89,9 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
                 out.flush();
             }
             System.out.println("Archivo trasmitido correctamente.");
-        } catch (IOException e) {
+        } catch (Exception e) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, e);
 
-            e.printStackTrace();
         }
         return true;
     }
@@ -140,10 +139,6 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
 
             return cliente;
         } catch (RemoteException ex) {
-            System.err.println("Ip no disponible, no se conecto con: " + PUERTO);
-            Cliente.addSet(serverAddress);
-            System.out.println("Ips no disponibles: \n" + Cliente.ipsNoDisp.toString());
-
         }
 
         return null;
