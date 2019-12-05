@@ -24,13 +24,15 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
     private File archivoLlegada;
     private String nombreArchivoAPedir;
     private long tamArchivoOriginal;
-    private static final Set<String> ipsNoDisp = new HashSet<>();
+    private static Set<String> ipsNoDisp = new HashSet<>();
+    private static Set<String> ipsCargadas;
     public OperacionesServidor objetoRemoto;
 
     public Cliente(String serverAddress, int PUERTO) throws RemoteException {
         super();
         this.serverAddress = serverAddress;
         this.PUERTO = PUERTO;
+
     }
 
     public static synchronized boolean addSet(String ipNoDisp) {
@@ -48,15 +50,22 @@ public class Cliente extends UnicastRemoteObject implements OperacionesCliente, 
 
         } catch (Exception ex) {
 
-            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Ip:" + this.serverAddress + " desconectada.");
             System.out.println("Ips no disponibles: \n" + Cliente.ipsNoDisp.toString());
             Cliente.addSet(serverAddress);
-            System.out.println("Redistribuyendo a 87");
-            Cliente cliente = Cliente.crearCliente("172.16.147.87", 3232);//pidiendo a linux
-            Cliente.pedirParteAlServer(nombreArchivoAPedir, cliente);//aqui iria cliente.llenarArchivoplano
 
+            redistribuir();
         }
+
+    }
+
+    private void redistribuir() {
+        String ipDisponible = "";
+
+        System.out.println("Redistribuyendo a:" + ipDisponible);
+        Cliente cliente = Cliente.crearCliente("172.16.147.87", 3232);//pidiendo a linux
+        Cliente.pedirParteAlServer(nombreArchivoAPedir, cliente);//aqui iria cliente.llenarArchivoplano
 
     }
 
